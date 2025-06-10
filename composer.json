@@ -1,0 +1,37 @@
+{
+    "name": "webdophp/prosystems-integration",
+    "version": "1.0.0",
+    "description": "ProSystems Integration for Laravel",
+    "autoload": {
+        "psr-4": {
+            "webdophp\\ProSystemsIntegration\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "webdophp\\ProSystemsIntegration\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Balandin Dmitriy",
+            "email": "web.do17@gmail.com"
+        }
+    ],
+    "reguire":{
+        "php": "^8.4"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "webdophp\\ProSystemsIntegration\\Providers\\ProSystemsIntegrationServiceProvider"
+            ]
+        }
+    },
+  "require": {
+    "ext-soap": "*"
+  }
+}

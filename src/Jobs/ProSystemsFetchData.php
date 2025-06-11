@@ -56,10 +56,10 @@ class ProSystemsFetchData implements ShouldQueue
             $auth = $service->authorize($this->login,  $this->password);
             // Если ошибка, то прекращаем работу
             if ($auth->has('error')) {
-                throw new Exception('ProSystems: '.$auth->get('error'), 1003);
+                throw new Exception('ProSystems: '.$auth->get('error').';Code - '.$auth->get('Code'), 1003);
             }
             if ($auth->get('Code') !== '000') {
-                throw new Exception('ProSystems: Authorization failed.', (int)$auth->get('Code'));
+                throw new Exception('ProSystems: Authorization failed.'.';Code - '.$auth->get('Code'), 1004);
             }
 
 
@@ -83,7 +83,7 @@ class ProSystemsFetchData implements ShouldQueue
                 return;
             }
             if ($data->get('Code') !== '000') {
-                throw new Exception('ProSystems: Error receiving data: '.$data->get('error'). ';Code - '.$data->get('Code'), (int)$data->get('Code'));
+                throw new Exception('ProSystems: Error receiving data: '.$data->get('error'). ';Code - '.$data->get('Code'), 1004);
             }
             $soapResponse = $data->get('ResultObject');
 
@@ -104,10 +104,10 @@ class ProSystemsFetchData implements ShouldQueue
 
                 // Если ошибка, то прекращаем работу
                 if ($confirm->has('error')) {
-                    throw new Exception('ProSystems: '.$confirm->get('error'), 1003);
+                    throw new Exception('ProSystems: '.$confirm->get('error'). ';Code - '.$data->get('Code'), 1003);
                 }
                 if ($confirm->get('Code') !== '000') {
-                    throw new Exception('ProSystems: Data confirmation error.', (int)$confirm->get('Code'));
+                    throw new Exception('ProSystems: Data confirmation error.'. ';Code - '.$data->get('Code'), 1004);
                 }
                 $dispatchNext = true;
 
@@ -198,10 +198,10 @@ class ProSystemsFetchData implements ShouldQueue
 
             // Если ошибка, то прекращаем работу
             if ($confirm->has('error')) {
-                throw new Exception('ProSystems: '.$confirm->get('error'), 1003);
+                throw new Exception('ProSystems: '.$confirm->get('error'). ';Code - '.$data->get('Code'), 1003);
             }
             if ($confirm->get('Code') !== '000') {
-                throw new Exception('ProSystems: Data confirmation error.', (int)$confirm->get('Code'));
+                throw new Exception('ProSystems: Data confirmation error. '. ';Code - '.$data->get('Code'), 1004);
             }
 
             // Делаем подтверждение, что пакет загружен

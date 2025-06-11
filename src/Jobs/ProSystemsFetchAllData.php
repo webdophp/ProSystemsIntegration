@@ -50,10 +50,10 @@ class ProSystemsFetchAllData implements ShouldQueue
             try {
                 $auth = $service->authorize($this->login, $this->password);
                 if ($auth->has('error')) {
-                    throw new Exception('ProSystems: ' . $auth->get('error'), 1003);
+                    throw new Exception('ProSystems: ' . $auth->get('error').';Code - '.$auth->get('Code'), 1003);
                 }
                 if ($auth->get('Code') !== '000') {
-                    throw new Exception('ProSystems: Authorization failed.', (int)$auth->get('Code'));
+                    throw new Exception('ProSystems: Authorization failed ;Code - '.$auth->get('Code'), 1004);
                 }
                 $resultObject = $auth->get('ResultObject');
                 if (!is_array($resultObject) || !isset($resultObject['Token'])) {
@@ -67,10 +67,10 @@ class ProSystemsFetchAllData implements ShouldQueue
                 $data = $service->provideOperationDetailsByUniqueId($token, $operation);
                 // Если ошибка, то прекращаем работу
                 if ($data->has('error')) {
-                    throw new Exception('ProSystems: ' . $data->get('error'), 1003);
+                    throw new Exception('ProSystems: ' . $data->get('error').';Code - '.$auth->get('Code'), 1003);
                 }
                 if ($data->get('Code') !== '000') {
-                    throw new Exception('ProSystems: ' . $data->get('error') . '  - ' . $data->get('Code'), 1002);
+                    throw new Exception('ProSystems: ' . $data->get('error').';Code - '.$auth->get('Code'), 1004);
                 }
                 $soapResponse = $data->get('ResultObject');
 

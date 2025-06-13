@@ -7,7 +7,6 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use webdophp\ProSystemsIntegration\Http\Resources\ProSystemsCollection;
-use webdophp\ProSystemsIntegration\Models\ControlTapeRecord;
 use webdophp\ProSystemsIntegration\Models\ProSystemsOperation;
 
 
@@ -77,7 +76,7 @@ class ProSystemsController
     {
         try{
             //Обновляем данные и говорим, что мы показали и приняли данные и больше их не показываем
-            ControlTapeRecord::where('sent_data', true)->update(['received_data' => true]);
+            ProSystemsOperation::where('sent_data', true)->update(['received_data' => true]);
             return response()->json(['status' => 'success', 'message' => Response::$statusTexts[Response::HTTP_OK]]);
 
         } catch (Exception $e) {

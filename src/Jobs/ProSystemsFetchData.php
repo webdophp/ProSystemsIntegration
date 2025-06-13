@@ -20,30 +20,6 @@ class ProSystemsFetchData implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Логин для авторизации
-     * @var string
-     */
-    protected string $login;
-
-    /**
-     * Пароль для авторизации
-     * @var string
-     */
-    protected string $password;
-
-    /**
-     * ID компании чей чек
-     * @var int
-     */
-    protected int $company_id;
-
-    public function __construct(string $login, string $password, int $company_id)
-    {
-        $this->login = $login;
-        $this->password = $password;
-        $this->company_id = $company_id;
-    }
 
     /**
      * @throws Throwable
@@ -53,19 +29,15 @@ class ProSystemsFetchData implements ShouldQueue
 
         $dispatchNext = false;
         DB::transaction(function () use ($service, &$dispatchNext) {
-            $auth = $service->authorize($this->login,  $this->password);
+            $auth = $service->authorize();
             // Если ошибка, то прекращаем работу
-            if ($auth->has('error')) {
-                throw new Exception('ProSystems: '.$auth->get('error').';Code - '.$auth->get('Code'), 1003);
-            }
             if ($auth->get('Code') !== '000') {
-                throw new Exception('ProSystems: Authorization failed.'.';Code - '.$auth->get('Code'), 1004);
+                throw new Exception('ProSystems: Authorization failed. Message:'.$auth->get('Message').';Code - '.$auth->get('Code'), 1001);
             }
-
 
             $resultObject = $auth->get('ResultObject');
             if (!is_array($resultObject) || !isset($resultObject['Token'])) {
-                throw new Exception('ProSystems: Missing token in authorization response.', 1005);
+                throw new Exception('ProSystems: Missing token in authorization response.', 1001);
             }
             $token = $resultObject['Token'];
             if (!$token) {
@@ -73,17 +45,14 @@ class ProSystemsFetchData implements ShouldQueue
             }
 
             $data = $service->provideData($token);
-            // Если ошибка, то прекращаем работу
-            if ($data->has('error')) {
-                throw new Exception('ProSystems: '.$data->get('error'). ';Code - '.$data->get('Code'), 1003);
-            }
             // Нет новых данных — корректное завершение без исключения
             if ($data->get('Code') === '110') {
                 Log::info('ProSystems: Все пакеты успешно получены и подтвержден.');
                 return;
             }
+            // Если ошибка, то прекращаем работу
             if ($data->get('Code') !== '000') {
-                throw new Exception('ProSystems: Error receiving data: '.$data->get('error'). ';Code - '.$data->get('Code'), 1004);
+                throw new Exception('ProSystems: Authorization failed. Message:'.$data->get('Message').';Code - '.$data->get('Code'), 1002);
             }
             $soapResponse = $data->get('ResultObject');
 
@@ -101,13 +70,9 @@ class ProSystemsFetchData implements ShouldQueue
                 Log::info('ProSystems: Пакет с GUID уже существует и будет пропущен: ' . $soapResponse['Packet']['Guid']);
                 //Делаем подтверждения данных
                 $confirm = $service->confirmData($token, $soapResponse['Packet']['Guid']);
-
                 // Если ошибка, то прекращаем работу
-                if ($confirm->has('error')) {
-                    throw new Exception('ProSystems: '.$confirm->get('error'). ';Code - '.$data->get('Code'), 1003);
-                }
                 if ($confirm->get('Code') !== '000') {
-                    throw new Exception('ProSystems: Data confirmation error.'. ';Code - '.$data->get('Code'), 1004);
+                    throw new Exception('ProSystems: Authorization failed. Message:'.$confirm->get('Message').';Code - '.$confirm->get('Code'), 1003);
                 }
                 $dispatchNext = true;
 
@@ -123,7 +88,7 @@ class ProSystemsFetchData implements ShouldQueue
 
 
             if (empty($soapResponse['Packet']['Content']['Operations']['BaseOperation'])) {
-                throw new Exception('ProSystems: No operations found in SOAP response.', 1004);
+                throw new Exception('ProSystems: No operations found in SOAP response.', 1002);
             }
 
             // Обрабатываем каждую операцию и сохраняем ее в базу
@@ -133,7 +98,6 @@ class ProSystemsFetchData implements ShouldQueue
 
                 $operation = $packet->operations()->create([
                     'packet_guid' => $packet->guid,
-                    'company_id' => $this->company_id,
                     'kkm_code' => $operationData['KKMCode'],
                     'type' => $operationData['Type'],
                     'tax_payer_bin' => $operationData['TaxPayerBIN'],
@@ -195,13 +159,9 @@ class ProSystemsFetchData implements ShouldQueue
 
             //Делаем подтверждения данных
             $confirm = $service->confirmData($token, $soapResponse['Packet']['Guid']);
-
             // Если ошибка, то прекращаем работу
-            if ($confirm->has('error')) {
-                throw new Exception('ProSystems: '.$confirm->get('error'). ';Code - '.$data->get('Code'), 1003);
-            }
             if ($confirm->get('Code') !== '000') {
-                throw new Exception('ProSystems: Data confirmation error. '. ';Code - '.$data->get('Code'), 1004);
+                throw new Exception('ProSystems: Authorization failed. Message:'.$confirm->get('Message').';Code - '.$confirm->get('Code'), 1003);
             }
 
             // Делаем подтверждение, что пакет загружен
@@ -213,7 +173,7 @@ class ProSystemsFetchData implements ShouldQueue
         });
 
         if ($dispatchNext) {
-            ProSystemsFetchData::dispatch($this->login, $this->password, $this->company_id);
+            ProSystemsFetchData::dispatch();
         }
     }
 

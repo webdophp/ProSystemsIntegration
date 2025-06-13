@@ -20,25 +20,6 @@ class ProSystemsFetchAllData implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Логин для авторизации
-     * @var string
-     */
-    protected string $login;
-
-    /**
-     * Пароль для авторизации
-     * @var string
-     */
-    protected string $password;
-
-
-    public function __construct(string $login, string $password)
-    {
-        $this->login = $login;
-        $this->password = $password;
-    }
-
 
     /**
      * @throws Throwable
@@ -48,16 +29,14 @@ class ProSystemsFetchAllData implements ShouldQueue
         $proSystemsOperation = ProSystemsOperation::where('received_detailed', false)->get();
         foreach ($proSystemsOperation as $operation) {
             try {
-                $auth = $service->authorize($this->login, $this->password);
-                if ($auth->has('error')) {
-                    throw new Exception('ProSystems: ' . $auth->get('error').';Code - '.$auth->get('Code'), 1003);
-                }
+                $auth = $service->authorize();
+                // Если ошибка, то прекращаем работу
                 if ($auth->get('Code') !== '000') {
-                    throw new Exception('ProSystems: Authorization failed ;Code - '.$auth->get('Code'), 1004);
+                    throw new Exception('ProSystems: Authorization failed. Message:'.$auth->get('Message').';Code - '.$auth->get('Code'), 1001);
                 }
                 $resultObject = $auth->get('ResultObject');
                 if (!is_array($resultObject) || !isset($resultObject['Token'])) {
-                    throw new Exception('ProSystems: Missing token in authorization response.', 1005);
+                    throw new Exception('ProSystems: Missing token in authorization response.', 1001);
                 }
                 $token = $resultObject['Token'];
                 if (!$token) {
@@ -66,11 +45,8 @@ class ProSystemsFetchAllData implements ShouldQueue
 
                 $data = $service->provideOperationDetailsByUniqueId($token, $operation);
                 // Если ошибка, то прекращаем работу
-                if ($data->has('error')) {
-                    throw new Exception('ProSystems: ' . $data->get('error').';Code - '.$auth->get('Code'), 1003);
-                }
                 if ($data->get('Code') !== '000') {
-                    throw new Exception('ProSystems: ' . $data->get('error').';Code - '.$auth->get('Code'), 1004);
+                    throw new Exception('ProSystems:  Message:'.$data->get('Message').';Code - '.$data->get('Code'), 1002);
                 }
                 $soapResponse = $data->get('ResultObject');
 

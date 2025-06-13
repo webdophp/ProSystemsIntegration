@@ -29,4 +29,8 @@ return [
 
     'base_url_all' => env('PRO_SYSTEMS_URL_ALL', 'https://test.softkkm.kz:5001/PROSYSTEMS-TEST202/FSCDataProvider/TEST/DETAIL/INSTANCE-A.asmx'),
 
+    /**
+     * API-ключ для получения данных в веб сервисе
+     */
+    'api_key_data' => env('PRO_SYSTEMS_API_KEY_DATA', ''),
 ];

@@ -49,6 +49,9 @@ PRO_SYSTEMS_PASSWORD=""
 
 # Базовый URL ProSystems (пример тестового адреса)
 PRO_SYSTEMS_URL=""
+
+# API-ключ для получения данных из веб сервиса
+PRO_SYSTEMS_API_KEY_DATA=""
 ```
 
 ## 4. Дополнительная информация
@@ -59,6 +62,108 @@ PRO_SYSTEMS_URL=""
 
 Отправка ошибок на почту происходит, только если 'error_mail' включено и указан адрес получателя.
 
+## 5. Получение данных из ProSystems (потоковая выгрузка)
+### 5.1. Получение данных из ProSystems вручную
+
+Для получения накопленных данных из системы «Программный Фискализатор 3.0.1» используется следующая очередь:
+```php
+use webdophp\ProSystemsIntegration\Jobs\ProSystemsFetchData;
+
+ProSystemsFetchData::dispatch();
+```
+
+### 5.2. Автоматический запуск через планировщик (scheduler)
+
+Для автоматического получения данных из системы «Программный Фискализатор 3.0.1» 
+рекомендуется настроить вызов ProSystemsFetchData::dispatch();
+через Laravel Scheduler.
+
+Например, в методе schedule() файла app/Console/Kernel.php добавьте:
+
+```php
+use webdophp\ProSystemsIntegration\Jobs\ProSystemsFetchData;
+
+protected function schedule(Schedule $schedule)
+{
+    $schedule->call(function () {
+        ProSystemsFetchData::dispatch();
+    })->everyFiveMinutes(); // или любое другое расписание
+}
+```
+
+## 6. Получение данных из ProSystems (детальная информация)
+### 6.1. Получение данных из ProSystems вручную
+
+Для получения накопленных данных из системы «Программный Фискализатор 3.0.1» используется следующая очередь:
+```php
+use webdophp\ProSystemsIntegration\Jobs\ProSystemsFetchAllData;
+
+ProSystemsFetchAllData::dispatch();
+```
+
+### 6.2. Автоматический запуск через планировщик (scheduler)
+
+Для автоматического получения данных из системы «Программный Фискализатор 3.0.1»
+рекомендуется настроить вызов ProSystemsFetchAllData::dispatch();
+через Laravel Scheduler.
+
+Например, в методе schedule() файла app/Console/Kernel.php добавьте:
+
+```php
+use webdophp\ProSystemsIntegration\Jobs\ProSystemsFetchAllData;
+
+protected function schedule(Schedule $schedule)
+{
+    $schedule->call(function () {
+        ProSystemsFetchAllData::dispatch();
+    })->everyFiveMinutes(); // или любое другое расписание
+}
+```
+
+Требования
+==========================
+> Для корректной работы очереди необходимо:
+> 
+> Убедиться, что очереди настроены в Laravel. Например, в .env указано:
+> ```ini
+> QUEUE_CONNECTION=database
+> ```
+> Создать таблицу для хранения очередей (если используется database драйвер):
+> ```bash
+> php artisan queue:table
+> php artisan migrate
+> ```
+> Запустить обработчик очередей:
+> ```bash
+> php artisan queue:work
+> ```
+
+## 7. Вызовы API
+#### 1. Проверка доступности сервиса
+```bash
+GET http://localhost/api/pro-systems/ping
+```
+#### 2. Получить данные
+```bash
+GET http://localhost/api/pro-systems/data
+```
+#### 3. Подтвердить получение данных
+```bash
+GET http://localhost/api/pro-systems/confirm
+```
+Обязательные заголовки
+> 
+> Каждый запрос к API должен содержать обязательный заголовок API-KEY.
+> 
+>Пример заголовков:
+> 
+> API-KEY: PRO_SYSTEMS_API_KEY_DATA (ваш_ключ_доступа) 
+
+Пример с использованием curl:
+```bash
+curl -X GET http://localhost:8000/api/pro-systems/ping \
+  -H "API-KEY: ваш_ключ_доступа"
+```
 
 
 

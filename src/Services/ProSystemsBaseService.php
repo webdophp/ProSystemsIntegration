@@ -14,16 +14,14 @@ class ProSystemsBaseService
 
     /**
      * Авторизация: получение токена.
-     * @param ?string $login
-     * @param ?string $password
      * @return Collection
      */
-    public function authorize(?string $login, ?string $password): Collection
+    public function authorize(): Collection
     {
         try {
             $response = $this->client->__soapCall('Authorize', [[
-                'login' => $login ?? config('pro-systems-integration.login'),
-                'password' => $password ?? config('pro-systems-integration.password'),
+                'login' => config('pro-systems-integration.login'),
+                'password' => config('pro-systems-integration.password'),
             ]]);
 
             return collect($this->parseResponse($response->AuthorizeResult));

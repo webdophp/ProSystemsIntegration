@@ -19,6 +19,7 @@ class ProSystemsCollection extends ResourceCollection
     {
         return $this->collection->transform(function ($item) use ($request) {
             return  [
+                'id' => $item->id,
                 'cashbox_unique_number' => $item->kkm_code,
                 'shift_number' => $item->work_session_number,
                 'operation_type' => $item->type,

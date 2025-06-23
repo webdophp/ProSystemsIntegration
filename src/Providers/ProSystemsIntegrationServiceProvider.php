@@ -33,6 +33,14 @@ class ProSystemsIntegrationServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            // Регистрация artisan-команд
+            $this->commands([
+                \webdophp\ProSystemsIntegration\Console\Commands\ProSystemsData::class,
+                \webdophp\ProSystemsIntegration\Console\Commands\ProSystemsDataInfo::class,
+            ]);
+        }
+
         // Публикация конфигов
         $this->publishes([
             __DIR__.'/../../config/pro-systems-integration.php' => config_path('pro-systems-integration.php'),

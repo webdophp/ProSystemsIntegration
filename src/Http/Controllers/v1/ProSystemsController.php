@@ -1,12 +1,12 @@
 <?php
 
-namespace webdophp\ProSystemsIntegration\Http\Controllers;
+namespace webdophp\ProSystemsIntegration\Http\Controllers\v1;
 
 
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use webdophp\ProSystemsIntegration\Http\Resources\ProSystemsCollection;
+use webdophp\ProSystemsIntegration\Http\Resources\v1\ProSystemsCollection;
 use webdophp\ProSystemsIntegration\Models\ProSystemsOperation;
 
 

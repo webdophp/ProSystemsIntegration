@@ -63,6 +63,8 @@ class ProSystemsIntegrationServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
 
         // Загрузка API маршрутов
-        $this->loadRoutesFrom(__DIR__.'/../../routes/api.php');
+        if (config('pro-systems-integration.load_routes', true)) {
+            $this->loadRoutesFrom(__DIR__ . '/../../routes/api.php');
+        }
     }
 }

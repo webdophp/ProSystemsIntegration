@@ -1,6 +1,6 @@
 <?php
 
-namespace webdophp\ProSystemsIntegration\Http\Resources;
+namespace webdophp\ProSystemsIntegration\Http\Resources\v1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;

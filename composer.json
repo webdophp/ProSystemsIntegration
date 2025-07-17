@@ -1,6 +1,6 @@
 {
     "name": "webdophp/prosystems-integration",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "ProSystems Integration for Laravel",
     "license": "MIT",
     "autoload": {
@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": "^8.4",
+        "php": "^8.3 || ^8.4",
         "ext-soap": "*"
     },
     "require-dev": {

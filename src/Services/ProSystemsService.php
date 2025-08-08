@@ -14,10 +14,18 @@ class ProSystemsService extends ProSystemsBaseService
      */
     public function __construct()
     {
-        $this->client = new SoapClient(config('pro-systems-integration.base_url').'?WSDL', [
+       $this->client = new SoapClient(config('pro-systems-integration.base_url').'?WSDL', [
             'trace' => 1,
             'exceptions' => true,
+            'stream_context' => [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ]
+            ],
+            'cache_wsdl' => WSDL_CACHE_NONE,
         ]);
+
     }
 
     /**

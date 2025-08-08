@@ -38,4 +38,9 @@ return [
      * Загружать маршруты или нет. Если нужно свою обработку middleware написать
      */
     'load_routes' => true,
+
+    /**
+     * Отключить проверку сертификата
+     */
+    'ssl' => env('PRO_SYSTEMS_INTEGRATION_SSL', true),
 ];

@@ -18,22 +18,21 @@ class ProSystemsService extends ProSystemsBaseService
         $options = [
             'trace' => true,
             'exceptions' => true,
-        ];
-
-        if (!config('pro-systems-integration.ssl')) {
-            $context = stream_context_create([
-                'ssl' => [
+            'stream_context' => stream_context_create([
+                'ssl' => !config('pro-systems-integration.ssl') ? [
                     'verify_peer' => false,
                     'verify_peer_name' => false,
                     'allow_self_signed' => true,
+                ] : [],
+                'http' => [
+                    'header' => "Content-Type: text/xml; charset=utf-8",
                 ],
-            ]);
-            $options['stream_context'] = $context;
-        }
+            ]),
+        ];
 
-        $this->client = new SoapClient(config('pro-systems-integration.base_url').'?WSDL', [
+        $this->client = new SoapClient(config('pro-systems-integration.base_url').'?WSDL',
             $options
-        ]);
+        );
 
     }
 

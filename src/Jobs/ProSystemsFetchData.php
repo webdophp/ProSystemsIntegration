@@ -52,7 +52,7 @@ class ProSystemsFetchData implements ShouldQueue
             }
             // Если ошибка, то прекращаем работу
             if ($data->get('Code') !== '000') {
-                throw new Exception('ProSystems: Authorization failed. Message:'.$data->get('Message').';Code - '.$data->get('Code'), 1002);
+                throw new Exception('ProSystems: Get data failed. Message:'.$data->get('Message').';Code - '.$data->get('Code'), 1002);
             }
             $soapResponse = $data->get('ResultObject');
 
@@ -161,7 +161,7 @@ class ProSystemsFetchData implements ShouldQueue
             $confirm = $service->confirmData($token, $soapResponse['Packet']['Guid']);
             // Если ошибка, то прекращаем работу
             if ($confirm->get('Code') !== '000') {
-                throw new Exception('ProSystems: Authorization failed. Message:'.$confirm->get('Message').';Code - '.$confirm->get('Code'), 1003);
+                throw new Exception('ProSystems: Confirm data failed. Message:'.$confirm->get('Message').';Code - '.$confirm->get('Code'), 1003);
             }
 
             // Делаем подтверждение, что пакет загружен

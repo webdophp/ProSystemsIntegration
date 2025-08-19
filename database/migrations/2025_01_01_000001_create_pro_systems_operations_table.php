@@ -34,10 +34,18 @@ return new class extends Migration {
             $table->index(['kkm_code', 'operation_date']);
             $table->comment('Операций');
         });
+
+        // Индекс для ускорения выборки данных (data())
+        DB::statement('CREATE INDEX IF NOT EXISTS pro_systems_operations_received_data_false_idx ON pro_systems_operations (id) WHERE received_data = false');
+        // Индекс для ускорения подтверждения (confirm())
+        DB::statement('CREATE INDEX IF NOT EXISTS pro_systems_operations_sent_data_true_idx ON pro_systems_operations (id) WHERE sent_data = true AND received_data = false');
+
     }
 
     public function down(): void
     {
+        DB::statement('DROP INDEX IF EXISTS pro_systems_operations_received_data_false_idx');
+        DB::statement('DROP INDEX IF EXISTS pro_systems_operations_sent_data_true_idx');
         Schema::dropIfExists('pro_systems_operations');
     }
 };

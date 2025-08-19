@@ -27,6 +27,9 @@ class ProSystemsOperation extends Model
         'cashier',
         'amount',
         'operation_type',
+        'sent_data',
+        'date_sent_data',
+        'received_data'
     ];
 
     protected $casts = [

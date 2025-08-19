@@ -35,7 +35,7 @@ class ProSystemsAllDataService extends ProSystemsBaseService
                 'Operations' => collect($result['ResultObject']['Packet']['Content']['Operations'] ?? [])
             ]);
         } catch (SoapFault $e) {
-            return collect(['error' => $e->getMessage()]);
+            return collect(['Message' =>  $e->getMessage(),'Code' => (string) $e->getCode()]);
         }
     }
 

@@ -5,7 +5,9 @@ namespace webdophp\ProSystemsIntegration\Http\Controllers\v1;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 use webdophp\ProSystemsIntegration\Http\Resources\v1\ProSystemsCollection;
 use webdophp\ProSystemsIntegration\Models\ProSystemsOperation;
 
@@ -25,9 +27,11 @@ class ProSystemsController
     /**
      * Взять пачку записей
      * @return JsonResponse|ProSystemsCollection
+     * @throws Throwable
      */
     public function data(): JsonResponse|ProSystemsCollection
     {
+        DB::beginTransaction();
         try{
             $records = ProSystemsOperation::where('received_data', false)
                 ->with([
@@ -46,6 +50,7 @@ class ProSystemsController
                 ])
                 ->orderBy('id', 'ASC')
                 ->limit(100)
+                ->lockForUpdate() // блокировка до конца транзакции (другие параллельные вызовы будут ждать)
                 ->get();
 
 
@@ -60,10 +65,11 @@ class ProSystemsController
                 'sent_data' => true,
                 'date_sent_data' => now(),
             ]);
-
+            DB::commit();
             return new ProSystemsCollection($records);
 
         } catch (Exception $e) {
+            DB::rollBack();
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }

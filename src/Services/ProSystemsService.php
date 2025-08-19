@@ -52,7 +52,7 @@ class ProSystemsService extends ProSystemsBaseService
                 'Operations' => collect($result['ResultObject']['Packet']['Content']['Operations'] ?? [])
             ]);
         } catch (SoapFault $e) {
-            return collect(['error' => $e->getMessage()]);
+            return collect(['Message' =>  $e->getMessage(),'Code' => (string) $e->getCode()]);
         }
     }
 
@@ -69,7 +69,7 @@ class ProSystemsService extends ProSystemsBaseService
 
             return collect($this->parseResponse($response->ConfirmDataResult));
         } catch (SoapFault $e) {
-            return collect(['error' => $e->getMessage()]);
+            return collect(['Message' =>  $e->getMessage(),'Code' => (string) $e->getCode()]);
         }
     }
 

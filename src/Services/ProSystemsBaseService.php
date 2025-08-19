@@ -26,7 +26,7 @@ class ProSystemsBaseService
 
             return collect($this->parseResponse($response->AuthorizeResult));
         } catch (SoapFault $e) {
-            return collect(['error' => $e->getMessage()]);
+            return collect(['Message' =>  $e->getMessage(),'Code' => (string) $e->getCode()]);
         }
     }
 

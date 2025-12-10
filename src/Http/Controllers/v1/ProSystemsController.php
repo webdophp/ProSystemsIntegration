@@ -33,6 +33,7 @@ class ProSystemsController
     {
         DB::beginTransaction();
         try{
+            $limit = config('pro-systems-integration.operation_limit', 100);
             $records = ProSystemsOperation::where('received_data', false)
                 ->with([
                     'packet' => function ($query) {
@@ -49,7 +50,7 @@ class ProSystemsController
                     }
                 ])
                 ->orderBy('id', 'ASC')
-                ->limit(100)
+                ->limit($limit)
                 ->lockForUpdate() // блокировка до конца транзакции (другие параллельные вызовы будут ждать)
                 ->get();
 

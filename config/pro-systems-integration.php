@@ -43,4 +43,9 @@ return [
      * Отключить проверку сертификата
      */
     'ssl' => env('PRO_SYSTEMS_INTEGRATION_SSL', true),
+
+    /**
+     * Количество записей при выборе
+     */
+    'operation_limit' => env('PRO_SYSTEMS_OPERATION_LIMIT', 100),
 ];

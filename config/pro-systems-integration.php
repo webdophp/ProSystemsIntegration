@@ -47,5 +47,5 @@ return [
     /**
      * Количество записей при выборе
      */
-    'operation_limit' => env('PRO_SYSTEMS_OPERATION_LIMIT', 100),
+    'operation_limit' => env('PRO_SYSTEMS_OPERATION_LIMIT', 20),
 ];

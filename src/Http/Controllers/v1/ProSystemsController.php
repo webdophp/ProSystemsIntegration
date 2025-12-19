@@ -5,6 +5,7 @@ namespace webdophp\ProSystemsIntegration\Http\Controllers\v1;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -33,7 +34,7 @@ class ProSystemsController
     {
         DB::beginTransaction();
         try{
-            $limit = config('pro-systems-integration.operation_limit', 100);
+            $limit = config('pro-systems-integration.operation_limit', 20);
             $records = ProSystemsOperation::where('received_data', false)
                 ->with([
                     'packet' => function ($query) {
@@ -51,7 +52,7 @@ class ProSystemsController
                 ])
                 ->orderBy('id', 'ASC')
                 ->limit($limit)
-                ->lockForUpdate() // блокировка до конца транзакции (другие параллельные вызовы будут ждать)
+               // ->lockForUpdate() // блокировка до конца транзакции (другие параллельные вызовы будут ждать)
                 ->get();
 
 
@@ -77,13 +78,18 @@ class ProSystemsController
 
     /**
      * Подтвердить получение данных
+     * @param Request $request
      * @return JsonResponse
      */
-    public function confirm(): JsonResponse
+    public function confirm(Request $request): JsonResponse
     {
         try{
+            $ids = $request->input('ids', []);
+            if (empty($ids) || !is_array($ids)) {
+                throw new Exception('Идентификаторы обязательны и должны быть массивом');
+            }
             //Обновляем данные и говорим, что мы показали и приняли данные и больше их не показываем
-            ProSystemsOperation::where('sent_data', true)->update(['received_data' => true]);
+            ProSystemsOperation::whereIn('id', $ids)->where('sent_data', true)->update(['received_data' => true]);
             return response()->json(['status' => 'success', 'message' => Response::$statusTexts[Response::HTTP_OK]]);
 
         } catch (Exception $e) {
